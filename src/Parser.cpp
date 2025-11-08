@@ -15,7 +15,9 @@ void Parser::advance() {
 
 bool Parser::expect(TokenKind kind, const char* errMsg) {
     if (curTok_.kind != kind) {
-        std::cerr << errMsg << "\n";
+        std::cerr << "Parse error: " << errMsg
+                  << " at token '" << curTok_.lexeme
+                  << "'\n";
         std::exit(1);
     }
     return true;
@@ -30,8 +32,10 @@ std::unique_ptr<Ast> Parser::parsePrimary() {
         return node;
     }
     if (curTok_.kind == TokenKind::IDENT) {
+        std::string name = curTok_.lexeme;
         advance();
-        auto node = std::make_unique<Ast>(AstKind::VarX);
+        auto node = std::make_unique<Ast>(AstKind::Var);
+        node->var_name = name;
         return node;
     }
     if (curTok_.kind == TokenKind::LPAREN) {
@@ -41,7 +45,8 @@ std::unique_ptr<Ast> Parser::parsePrimary() {
         advance();
         return expr;
     }
-    std::cerr << "Unexpected token in primary\n";
+    std::cerr << "Unexpected token in primary: '"
+              << curTok_.lexeme << "'\n";
     std::exit(1);
 }
 
@@ -61,17 +66,24 @@ std::unique_ptr<Ast> Parser::parseExpression() {
     return lhs;
 }
 
+std::unique_ptr<Ast> Parser::parseAssignment() {
+    expect(TokenKind::IDENT, "Expected variable name in assignment");
+    std::string name = curTok_.lexeme;
+    advance();
+    expect(TokenKind::ASSIGN, "Expected '=' after variable");
+    advance();
+    auto expr = parseExpression();
+    expect(TokenKind::SEMI, "Expected ';' after assignment");
+    advance();
+    auto node = std::make_unique<Ast>(AstKind::Assign);
+    node->var_name = name;
+    node->left = std::move(expr);
+    return node;
+}
+
 std::unique_ptr<Ast> Parser::parseStatement() {
     if (curTok_.kind == TokenKind::IDENT) {
-        advance();
-        expect(TokenKind::ASSIGN, "Expected '=' after variable");
-        advance();
-        auto expr = parseExpression();
-        expect(TokenKind::SEMI, "Expected ';' after assignment");
-        advance();
-        auto node = std::make_unique<Ast>(AstKind::Assign);
-        node->left = std::move(expr);
-        return node;
+        return parseAssignment();
     }
     if (curTok_.kind == TokenKind::RETURN) {
         advance();
@@ -82,7 +94,8 @@ std::unique_ptr<Ast> Parser::parseStatement() {
         node->left = std::move(expr);
         return node;
     }
-    std::cerr << "Unexpected statement token\n";
+    std::cerr << "Unexpected statement token: '"
+              << curTok_.lexeme << "'\n";
     std::exit(1);
 }
 
@@ -102,7 +115,7 @@ std::unique_ptr<Ast> Parser::parseProgram() {
     while (curTok_.kind != TokenKind::RBRACE) {
         seqNode->stmts.push_back(parseStatement());
     }
-    advance(); // consume '}'
+    advance();
     expect(TokenKind::EOF_TOKEN, "Expected end of file");
     return seqNode;
 }

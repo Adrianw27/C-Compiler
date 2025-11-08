@@ -1,4 +1,5 @@
 // Takes token stream from lexer and builds ast - definition
+
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
@@ -20,6 +21,8 @@ private:
     std::unique_ptr<Ast> parsePrimary();
     std::unique_ptr<Ast> parseExpression();
     std::unique_ptr<Ast> parseStatement();
+    std::unique_ptr<Ast> parseAssignment();
 };
 
 #endif
+
