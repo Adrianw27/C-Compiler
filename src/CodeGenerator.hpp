@@ -12,8 +12,9 @@ public:
 
 private:
     Ast* root_;
-    void genStmt(Ast* node);
-    void genExpr(Ast* node);
+    void generateStmt(Ast* stmt);
+    void generateExpr(Ast* expr);
+    void comment(const std::string &s);
 };
 
-#endif // CODEGEN_HPP
+#endif
