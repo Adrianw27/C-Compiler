@@ -27,7 +27,7 @@ gcc -o cprogram test.s
 ```
 ./cprogram
 ```
-8. If your program returns a value instead of text, view result
+8. View return value
 ```
 echo $?
 ```
