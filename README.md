@@ -21,9 +21,13 @@ cd ..
 ```
 6. Create executable
 ```
-gcc -o test test.s
+gcc -o cprogram test.s
 ```
 7. Run executable (may need to change permissions with chmod)
 ```
-./test
+./cprogram
+```
+8. If your program returns a value instead of text, view result
+```
+echo $?
 ```
