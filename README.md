@@ -17,7 +17,7 @@ cmake --build . --config Release
 5. Run compiler to create assembly output
 ```
 cd ..
-.\build\bin\release\ccompiler_cpp.exe .\tests\test.c > test.s
+.\build\bin\release\ccompiler_cpp.exe .\test\test.c > test.s
 ```
 6. Create executable
 ```
